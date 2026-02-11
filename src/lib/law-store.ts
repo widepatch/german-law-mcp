@@ -8,7 +8,7 @@ export function getLawsDir(): string {
   }
 
   const xdgData = process.env.XDG_DATA_HOME || path.join(homedir(), '.local', 'share');
-  return path.join(xdgData, 'gesetze-im-internet-mcp', 'laws');
+  return path.join(xdgData, 'german-law-mcp', 'laws');
 }
 
 export function getLawXmlPath(lawName: string): string {
