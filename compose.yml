@@ -1,9 +1,0 @@
-services:
-  german-law-mcp:
-    build:
-      context: .
-      dockerfile: mcp/Dockerfile
-    container_name: german-law-mcp-server
-    volumes:
-      - ./laws:/app/laws:rw
-    restart: unless-stopped

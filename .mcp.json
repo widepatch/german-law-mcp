@@ -1,8 +1,8 @@
 {
   "mcpServers": {
     "german-law": {
-      "command": "flatpak-spawn",
-      "args": ["--host", "podman", "exec", "-i", "german-law-mcp-server", "node", "src/index.js"]
+      "command": "node",
+      "args": ["dist/index.js"]
     }
   }
 }

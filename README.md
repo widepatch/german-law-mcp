@@ -1,93 +1,132 @@
-# German Law XML Tools
+# gesetze-im-internet-mcp
 
-Tools zum Herunterladen und Durchsuchen deutscher Gesetze von gesetze-im-internet.de.
+MCP server for accessing German federal laws from [gesetze-im-internet.de](https://www.gesetze-im-internet.de). Download, browse, and extract paragraphs from any law — directly from Claude Code, Claude Desktop, or any MCP client.
 
-## Voraussetzungen
+> **Disclaimer:** This tool provides raw legal text from the official German federal law database for informational purposes only. It does **not** constitute legal advice. The texts may be outdated, incomplete, or incorrectly parsed. Always verify against the [official publication](https://www.gesetze-im-internet.de) and consult a qualified legal professional for any legal matters.
 
-- Podman oder Docker
+## Quick Start
 
-## Shell-Scripts (lokale Nutzung)
-
-### 1. Gesetz herunterladen
-```bash
-./law-xml-downloader.sh <gesetz-name>
-./law-xml-downloader.sh --force-update <gesetz-name>
-```
-
-### 2. Inhaltsverzeichnis anzeigen
-```bash
-./table-of-contents.sh <gesetz-name>
-```
-
-### 3. Paragraph extrahieren
-```bash
-./get-para.sh <paragraph> <gesetz-name> [absatz]
-```
-
-**Beispiele:**
-```bash
-./law-xml-downloader.sh estg
-./table-of-contents.sh estg
-./get-para.sh "§ 70" estg              # Ganzer Paragraph
-./get-para.sh "§ 70" estg 2            # Nur Absatz 2
-./get-para.sh "§ 70" estg "[1,3]"      # Absätze 1 und 3
-```
-
-## MCP Server (Claude Code Integration)
-
-### Container bauen und starten
+### Claude Code
 
 ```bash
-podman build -t german-law-mcp -f mcp/Dockerfile .
-podman run -d --name german-law-mcp-server -v ./laws:/app/laws:Z german-law-mcp
+claude mcp add german-law -- npx -y gesetze-im-internet-mcp
 ```
 
-### MCP in Claude Code einbinden
+### Claude Desktop / Manual Config
 
-Erstelle `.mcp.json` im Projektverzeichnis oder füge zu `~/.claude.json` hinzu:
+Add to your MCP configuration:
 
 ```json
 {
   "mcpServers": {
     "german-law": {
-      "command": "podman",
-      "args": ["exec", "-i", "german-law-mcp-server", "node", "src/index.js"]
+      "command": "npx",
+      "args": ["-y", "gesetze-im-internet-mcp"]
     }
   }
 }
 ```
 
-### Verfügbare MCP Tools
+That's it — no Docker, no system dependencies. Just Node.js 18+.
 
-| Tool | Beschreibung |
-|------|--------------|
-| `download_law` | Gesetz von gesetze-im-internet.de herunterladen |
-| `list_contents` | Inhaltsverzeichnis (alle Paragraphen) anzeigen |
-| `get_paragraph` | Paragraph extrahieren (optional mit Absatz-Filter) |
+## Tools
 
-### Beispiel-Prompts
+| Tool | Description | Parameters |
+|------|-------------|------------|
+| `download_law` | Download a law from gesetze-im-internet.de | `law_name`, `force_update?` |
+| `list_contents` | List all paragraphs (table of contents) | `law_name` |
+| `get_paragraph` | Extract a specific paragraph with optional subsection filter | `paragraph`, `law_name`, `absatz?` |
+
+### Law Names
+
+Law names match the URL slug on gesetze-im-internet.de:
+
+| Law | `law_name` |
+|-----|-----------|
+| Grundgesetz | `gg` |
+| Bürgerliches Gesetzbuch | `bgb` |
+| Einkommensteuergesetz | `estg` |
+| Abgabenordnung | `ao_1977` |
+| Sozialgesetzbuch III | `sgb_3` |
+| Handelsgesetzbuch | `hgb` |
+| Strafgesetzbuch | `stgb` |
+
+Find more at [gesetze-im-internet.de/Teilliste_A.html](https://www.gesetze-im-internet.de/Teilliste_A.html).
+
+## Example Queries
 
 ```
-Lade das EStG herunter und zeige mir § 32
-Zeig mir das Inhaltsverzeichnis der AO
-Was steht in § 1 Absatz 3 EStG?
+Download the BGB and show me § 433.
 ```
 
-## Dateistruktur
-
 ```
-laws/
-├── estg/
-│   └── estg.xml
-└── ao_1977/
-    └── ao_1977.xml
+What does § 1 of the Grundgesetz say?
 ```
 
-Das `laws/` Verzeichnis ist via Volume mit dem Container synchronisiert.
+```
+Show me § 32 Absatz 6 EStG.
+```
 
-## Container neu starten
+```
+List the table of contents of the Abgabenordnung (ao_1977).
+```
+
+```
+Compare § 823 Absatz 1 and Absatz 2 BGB.
+```
+
+```
+Download sgb_3 and show me § 159 Absätze [1,3,5].
+```
+
+## Configuration
+
+### Storage Location
+
+Downloaded XML files are stored in:
+
+```
+~/.local/share/gesetze-im-internet-mcp/laws/<law_name>/<law_name>.xml
+```
+
+Override with the `LAWS_DIR` environment variable:
+
+```json
+{
+  "mcpServers": {
+    "german-law": {
+      "command": "npx",
+      "args": ["-y", "gesetze-im-internet-mcp"],
+      "env": {
+        "LAWS_DIR": "/path/to/your/laws"
+      }
+    }
+  }
+}
+```
+
+## Development
 
 ```bash
-podman stop german-law-mcp-server && podman rm german-law-mcp-server
-podman run -d --name german-law-mcp-server -v ./laws:/app/laws:Z german-law-mcp
+git clone https://github.com/your-username/gesetze-im-internet-mcp.git
+cd gesetze-im-internet-mcp
+npm install
+npm run build
 ```
+
+For local testing, use the `.mcp.json` in the repo:
+
+```json
+{
+  "mcpServers": {
+    "german-law": {
+      "command": "node",
+      "args": ["dist/index.js"]
+    }
+  }
+}
+```
+
+## License
+
+MIT

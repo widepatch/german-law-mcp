@@ -1,8 +1,0 @@
-{
-  "mcpServers": {
-    "german-law": {
-      "command": "podman",
-      "args": ["exec", "-i", "german-law-mcp-server", "node", "src/index.js"]
-    }
-  }
-}
