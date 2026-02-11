@@ -1,6 +1,6 @@
 {
   "name": "gesetze-im-internet-mcp",
-  "version": "3.0.0",
+  "version": "0.1.0",
   "description": "MCP Server for German Law XML Tools (gesetze-im-internet.de)",
   "type": "module",
   "main": "dist/index.js",
@@ -36,5 +36,9 @@
     "legal",
     "gesetze-im-internet"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kai-bruell/gesetze-im-internet-mcp"
+  }
 }
