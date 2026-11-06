@@ -1,6 +1,6 @@
 {
   "name": "german-law-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MCP server for accessing German federal law texts from gesetze-im-internet.de",
   "type": "module",
   "main": "dist/index.js",
@@ -39,6 +39,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/kai-bruell/german-law-mcp"
+    "url": "https://github.com/widepatch/german-law-mcp"
   }
 }
